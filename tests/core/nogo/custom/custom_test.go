@@ -86,6 +86,16 @@ go_library(
 )
 
 go_library(
+    name = "uses_cgo_with_errors",
+    srcs = [
+        "examplepkg/uses_cgo_clean.go",
+        "examplepkg/pure_src_with_err_calling_native.go",
+    ],
+    importpath = "examplepkg",
+    cgo = True,
+)
+
+go_library(
     name = "no_errors",
     srcs = ["no_errors.go"],
     importpath = "noerrors",
@@ -336,6 +346,24 @@ package dep
 func D() {
 }
 
+-- examplepkg/uses_cgo_clean.go --
+package examplepkg
+
+// #include <unistd.h>
+import "C"
+
+func Bar() bool {
+  C.getpid()
+  return true
+}
+
+-- examplepkg/pure_src_with_err_calling_native.go --
+package examplepkg
+
+func Foo() bool { // This should fail foofuncname
+  return Bar()
+}
+
 `,
 	})
 }
@@ -387,6 +415,14 @@ func Test(t *testing.T) {
 			},
 			excludes: []string{
 				`importfmt`,
+			},
+		}, {
+			desc:        "uses_cgo_with_errors",
+			config:      "config.json",
+			target:      "//:uses_cgo_with_errors",
+			wantSuccess: false,
+			includes: []string{
+				`.*/cgo\/examplepkg\/pure_src_with_err_calling_native.go:.*function must not be named Foo \(foofuncname\)`,
 			},
 		}, {
 			desc:        "no_errors",
