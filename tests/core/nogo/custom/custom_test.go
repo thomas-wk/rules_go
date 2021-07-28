@@ -455,7 +455,7 @@ func Test(t *testing.T) {
 				if matched, err := regexp.Match(pattern, stderr.Bytes()); err != nil {
 					t.Fatal(err)
 				} else if !matched {
-					t.Errorf("output did not contain pattern: %s", pattern)
+					t.Errorf("got output:\n %s\n which does not contain pattern: %s", string(stderr.Bytes()), pattern)
 				}
 			}
 			for _, pattern := range test.excludes {
