@@ -349,12 +349,14 @@ func D() {
 -- examplepkg/uses_cgo_clean.go --
 package examplepkg
 
-// #include <unistd.h>
+// #include <stdlib.h>
 import "C"
 
 func Bar() bool {
-  C.getpid()
-  return true
+  if C.rand() > 10 {
+    return true
+  }
+  return false
 }
 
 -- examplepkg/pure_src_with_err_calling_native.go --
