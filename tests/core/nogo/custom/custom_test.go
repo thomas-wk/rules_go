@@ -424,7 +424,8 @@ func Test(t *testing.T) {
 			target:      "//:uses_cgo_with_errors",
 			wantSuccess: false,
 			includes: []string{
-				`.*/cgo\/examplepkg\/pure_src_with_err_calling_native.go:.*function must not be named Foo \(foofuncname\)`,
+				// note the cross platform regex :)
+				`.*[\\/]cgo[\\/]examplepkg[\\/]pure_src_with_err_calling_native.go:.*function must not be named Foo \(foofuncname\)`,
 			},
 		}, {
 			desc:        "no_errors",
